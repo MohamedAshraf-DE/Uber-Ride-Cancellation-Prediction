@@ -12,6 +12,7 @@ seaborn==0.13.2
 altair==5.5.0
 pydeck==0.9.1
 wordcloud==1.9.4
+pillow>=10.0.1
 
 requests==2.32.5
 beautifulsoup4==4.13.5
@@ -19,4 +20,4 @@ lxml>=4.9.4
 dacite==1.9.2
 joblib==1.5.2
 
-rich  # removed explicit version
+rich
