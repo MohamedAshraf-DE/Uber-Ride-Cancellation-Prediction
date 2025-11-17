@@ -2,40 +2,31 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
-import time
-import matplotlib.pyplot as plt
-import seaborn as sns
 from pathlib import Path
 import base64
 from fpdf import FPDF
-
-# Lottie
-try:
-    from streamlit_lottie import st_lottie
-    import requests
-except Exception:
-    st.error("Install: pip install streamlit-lottie requests fpdf2 seaborn matplotlib")
-    st.stop()
+import requests
+from streamlit_lottie import st_lottie
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # -----------------------
 # Config + paths
 # -----------------------
 st.set_page_config(page_title="Ride Cancellation Predictor", page_icon="🚖", layout="wide")
 
-# --- FIXED PATHS SECTION ---
-# 1. We use Path(__file__).parent to get the folder where app.py is running (works on Linux/Cloud)
 BASE_DIR = Path(__file__).parent
 
-# 2. Based on your screenshot, files are in the ROOT, not in subfolders
 MODEL_PATH = BASE_DIR / "ride_cancel_model.pkl"
 LOGO_PATH = BASE_DIR / "uber-icon.png"
 IMAGE_PATH = BASE_DIR / "Car.jpg"
 
-# 3. Sounds are also in the root in your screenshot
 SUCCESS_SOUND = BASE_DIR / "great-success-384935.mp3"
 FAIL_SOUND = BASE_DIR / "cartoon-fail-trumpet-278822.mp3"
 
-# --- Function to load and encode image ---
+# -----------------------
+# Load and encode image
+# -----------------------
 @st.cache_data
 def get_image_as_base64(file_path):
     try:
@@ -47,9 +38,10 @@ def get_image_as_base64(file_path):
 
 img_base64 = get_image_as_base64(IMAGE_PATH)
 
-# --- CSS Styling ---
+# -----------------------
+# CSS Styling
+# -----------------------
 if img_base64:
-    # Note: Double braces {{ }} used here for CSS, single { } for the python variable
     background_css = f"""
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/jpeg;base64,{img_base64}");
@@ -79,18 +71,13 @@ else:
     }
     """
 
-# --- Full CSS for sidebar, containers, buttons, scrollbars ---
-# IMPORTANT: All CSS braces below are doubled {{ }} to escape the f-string
 st.markdown(f"""
     <style>
     {background_css}
-
-    /* Scrollbar Styling */
     ::-webkit-scrollbar {{ width: 10px; }}
     ::-webkit-scrollbar-track {{ background: rgba(0,0,0,0.2); }}
     ::-webkit-scrollbar-thumb {{ background-color: #2ECC71; border-radius: 10px; border: 2px solid rgba(0,0,0,0.2); }}
     ::-webkit-scrollbar-thumb:hover {{ background-color: #27AE60; }}
-
     [data-testid="stSidebar"] {{ 
         background: rgba(0, 0, 0, 0.4); 
         backdrop-filter: blur(15px); 
@@ -104,8 +91,6 @@ st.markdown(f"""
         scrollbar-width: thin;
         scrollbar-color: #2ECC71 rgba(0, 0, 0, 0.2);
     }}
-    
-    /* Style specifically for the results boxes - FIXED BRACES HERE */
     .results-container {{ text-align: center; margin-top: 20px; }}
     .success-box {{
         background-color: rgba(46, 204, 113, 0.2);
@@ -128,21 +113,30 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # -----------------------
-# Load model
+# Load model safely
 # -----------------------
 @st.cache_resource(show_spinner=False)
-def load_model(path):
-    return joblib.load(path)
+def load_model_safe(path):
+    if path.exists():
+        st.write(f"Loading model from: {path}")  # Debug info
+        return joblib.load(path)
+    else:
+        st.error(f"Model file not found at: {path}")
+        return None
 
-model = load_model(MODEL_PATH) if MODEL_PATH.exists() else None
+MODEL_PATHS = [BASE_DIR / "ride_cancel_model.pkl", Path("ride_cancel_model.pkl")]
+model = None
+for p in MODEL_PATHS:
+    model = load_model_safe(p)
+    if model is not None:
+        break
+
 expected_features = getattr(model, "feature_names_in_", None)
 
 # -----------------------
-# Sound helpers
+# Sounds
 # -----------------------
-# We check if the specific files exist in the current directory
 SOUNDS_AVAILABLE = SUCCESS_SOUND.exists() and FAIL_SOUND.exists()
-
 def play_sound_simple(file_path: Path):
     if file_path.exists():
         st.audio(str(file_path), format="audio/mp3", autoplay=True)
@@ -156,7 +150,7 @@ if "last_result" not in st.session_state: st.session_state.last_result = None
 if "user_interacted" not in st.session_state: st.session_state.user_interacted = False
 
 # -----------------------
-# Sidebar Layout
+# Sidebar
 # -----------------------
 with st.sidebar:
     st.header("⚙️ Controls")
@@ -171,7 +165,6 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # --- Form ---
     st.header("📝 Enter Ride Details")
     with st.form("input_form"):
         rd = st.number_input("📍 Ride Distance (km)", 0.0, 500.0, 10.0, step=0.5)
@@ -186,7 +179,7 @@ with st.sidebar:
         predict_button = st.form_submit_button("Predict Cancellation →")
 
 # -----------------------
-# Main Page Header
+# Header
 # -----------------------
 cols = st.columns([0.15, 0.7, 0.15])
 with cols[0]:
@@ -196,7 +189,6 @@ with cols[1]:
     st.markdown("<h1 style='text-align: center;'>🚖 Ride Cancellation Predictor</h1>", unsafe_allow_html=True)
     st.markdown("<h3 style='text-align: center;'>Will your ride be completed or cancelled?</h3>", unsafe_allow_html=True)
 with cols[2]:
-    anim = None
     try: anim = st_lottie(requests.get("https://assets7.lottiefiles.com/packages/lf20_iwmd6pyr.json").json(), height=100, key="header_lottie")
     except: pass
 
@@ -248,7 +240,6 @@ if predict_button:
 
         st.session_state.last_result = {"Prediction": int(pred), "Prob_Completed": float(proba[0]), "Prob_Cancelled": float(proba[1])}
 
-        # Display results
         with st.container():
             st.markdown('<div class="results-container">', unsafe_allow_html=True)
             if pred==1:
