@@ -22,15 +22,18 @@ except Exception:
 # -----------------------
 st.set_page_config(page_title="Ride Cancellation Predictor", page_icon="🚖", layout="wide")
 
-# --- PATHS ---
-BASE_DIR = Path(r"C:\Users\PCCV\OneDrive - Alexandria National University\Desktop\streamlit")
-MODEL_PATH = BASE_DIR / "ride_cancel_model.pkl"
-LOGO_PATH = BASE_DIR / "logos" / "uber-icon.png"
-SOUNDS_PATH = BASE_DIR / "sounds"
-IMAGE_PATH = BASE_DIR / "Car.jpg"  # background image
+# --- FIXED PATHS SECTION ---
+# 1. We use Path(__file__).parent to get the folder where app.py is running (works on Linux/Cloud)
+BASE_DIR = Path(__file__).parent
 
-SUCCESS_SOUND = SOUNDS_PATH / "great-success-384935.mp3"
-FAIL_SOUND = SOUNDS_PATH / "cartoon-fail-trumpet-278822.mp3"
+# 2. Based on your screenshot, files are in the ROOT, not in subfolders
+MODEL_PATH = BASE_DIR / "ride_cancel_model.pkl"
+LOGO_PATH = BASE_DIR / "uber-icon.png"             # Changed: removed /logos/
+IMAGE_PATH = BASE_DIR / "Car.jpg"
+
+# 3. Sounds are also in the root in your screenshot
+SUCCESS_SOUND = BASE_DIR / "great-success-384935.mp3"       # Changed: removed /sounds/
+FAIL_SOUND = BASE_DIR / "cartoon-fail-trumpet-278822.mp3"   # Changed: removed /sounds/
 
 # --- Function to load and encode image ---
 @st.cache_data
@@ -99,9 +102,26 @@ st.markdown(f"""
         scrollbar-width: thin;
         scrollbar-color: #2ECC71 rgba(0, 0, 0, 0.2);
     }}
-
-    /* Other CSS (buttons, containers, titles, etc.) - same as your previous code */
-    /* For brevity, assume all other CSS from your previous app is copied here */
+    
+    /* Style specifically for the results boxes */
+    .results-container { text-align: center; margin-top: 20px; }
+    .success-box {
+        background-color: rgba(46, 204, 113, 0.2);
+        border: 2px solid #2ECC71;
+        color: #2ECC71;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 24px;
+    }
+    .error-box {
+        background-color: rgba(231, 76, 60, 0.2);
+        border: 2px solid #E74C3C;
+        color: #E74C3C;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 24px;
+    }
+    .footer-text { text-align: center; color: #bdc3c7; font-size: 0.9em; margin-top: 50px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -118,7 +138,8 @@ expected_features = getattr(model, "feature_names_in_", None)
 # -----------------------
 # Sound helpers
 # -----------------------
-SOUNDS_AVAILABLE = SOUNDS_PATH.exists() and SUCCESS_SOUND.exists() and FAIL_SOUND.exists()
+# We check if the specific files exist in the current directory
+SOUNDS_AVAILABLE = SUCCESS_SOUND.exists() and FAIL_SOUND.exists()
 
 def play_sound_simple(file_path: Path):
     if file_path.exists():
@@ -142,13 +163,9 @@ with st.sidebar:
     show_charts = st.checkbox("📊 Show detailed charts", value=False)
     
     with st.expander("🔊 Sound Files Status"):
-        if SOUNDS_PATH.exists():
-            st.success("✅ Sounds folder found")
-            st.write(f"**Success sound:** {'✅' if SUCCESS_SOUND.exists() else '❌'}") 
-            st.write(f"**Fail sound:** {'✅' if FAIL_SOUND.exists() else '❌'}")
-            if not SOUNDS_AVAILABLE: st.error("❌ Some sound files are missing!")
-        else:
-            st.error(f"❌ Sounds folder not found at {SOUNDS_PATH}")
+        st.write(f"**Success sound:** {'✅' if SUCCESS_SOUND.exists() else '❌'}") 
+        st.write(f"**Fail sound:** {'✅' if FAIL_SOUND.exists() else '❌'}")
+        if not SOUNDS_AVAILABLE: st.error("❌ Some sound files are missing from the root folder!")
     
     st.markdown("---")
     
@@ -239,8 +256,6 @@ if predict_button:
                 st.markdown(f'<div class="success-box"><span>COMPLETED</span><br><strong>{proba[0]:.1%} Likelihood</strong></div>', unsafe_allow_html=True)
                 if enable_sounds and SOUNDS_AVAILABLE and st.session_state.user_interacted: play_sound_simple(SUCCESS_SOUND)
             st.markdown("</div>", unsafe_allow_html=True)
-
-        # Explanations (same as your previous code, can copy notes logic)
 
 # -----------------------
 # Footer
