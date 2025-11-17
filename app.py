@@ -28,12 +28,12 @@ BASE_DIR = Path(__file__).parent
 
 # 2. Based on your screenshot, files are in the ROOT, not in subfolders
 MODEL_PATH = BASE_DIR / "ride_cancel_model.pkl"
-LOGO_PATH = BASE_DIR / "uber-icon.png"             # Changed: removed /logos/
+LOGO_PATH = BASE_DIR / "uber-icon.png"
 IMAGE_PATH = BASE_DIR / "Car.jpg"
 
 # 3. Sounds are also in the root in your screenshot
-SUCCESS_SOUND = BASE_DIR / "great-success-384935.mp3"       # Changed: removed /sounds/
-FAIL_SOUND = BASE_DIR / "cartoon-fail-trumpet-278822.mp3"   # Changed: removed /sounds/
+SUCCESS_SOUND = BASE_DIR / "great-success-384935.mp3"
+FAIL_SOUND = BASE_DIR / "cartoon-fail-trumpet-278822.mp3"
 
 # --- Function to load and encode image ---
 @st.cache_data
@@ -49,6 +49,7 @@ img_base64 = get_image_as_base64(IMAGE_PATH)
 
 # --- CSS Styling ---
 if img_base64:
+    # Note: Double braces {{ }} used here for CSS, single { } for the python variable
     background_css = f"""
     [data-testid="stAppViewContainer"] {{
         background-image: url("data:image/jpeg;base64,{img_base64}");
@@ -79,6 +80,7 @@ else:
     """
 
 # --- Full CSS for sidebar, containers, buttons, scrollbars ---
+# IMPORTANT: All CSS braces below are doubled {{ }} to escape the f-string
 st.markdown(f"""
     <style>
     {background_css}
@@ -103,25 +105,25 @@ st.markdown(f"""
         scrollbar-color: #2ECC71 rgba(0, 0, 0, 0.2);
     }}
     
-    /* Style specifically for the results boxes */
-    .results-container { text-align: center; margin-top: 20px; }
-    .success-box {
+    /* Style specifically for the results boxes - FIXED BRACES HERE */
+    .results-container {{ text-align: center; margin-top: 20px; }}
+    .success-box {{
         background-color: rgba(46, 204, 113, 0.2);
         border: 2px solid #2ECC71;
         color: #2ECC71;
         padding: 20px;
         border-radius: 10px;
         font-size: 24px;
-    }
-    .error-box {
+    }}
+    .error-box {{
         background-color: rgba(231, 76, 60, 0.2);
         border: 2px solid #E74C3C;
         color: #E74C3C;
         padding: 20px;
         border-radius: 10px;
         font-size: 24px;
-    }
-    .footer-text { text-align: center; color: #bdc3c7; font-size: 0.9em; margin-top: 50px; }
+    }}
+    .footer-text {{ text-align: center; color: #bdc3c7; font-size: 0.9em; margin-top: 50px; }}
     </style>
 """, unsafe_allow_html=True)
 
