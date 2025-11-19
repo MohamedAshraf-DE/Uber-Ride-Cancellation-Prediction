@@ -1,6 +1,7 @@
-🚗 Uber Ride Cancellation Predictor 💥
-![Uber Ride Cancellation Predictor](https://github.com/MohamedAshraf-DE/Uber-Ride-Cancellation-Prediction/blob/main/Car web app** that predicts the likelihood of Uber ride cancellations using machine learning.
-This project is designed for both platforms and regular users to understand cancellation risks, improve trip reliability, and optimize operational decisions.
+![Uber Ride Cancellation Predictor](https://github.com/MohamedAshraf-DE/Uber-Ride-Cancellation-Prediction/blob/main/Car Ride Cancellation Predictor ❌
+
+A live web app that predicts the likelihood of Uber ride cancellations using machine learning.
+This project helps platforms and users understand cancellation risks, improve trip reliability, and optimize operational decisions.
 
 🌟 Why This Project Matters
 🏢 For Ride-Hailing Platforms
@@ -8,12 +9,12 @@ Reduce lost revenue by anticipating cancellations and reallocating drivers effic
 
 Simulate “what-if” scenarios such as changing booking times or payment methods.
 
-Improve rider and driver experience through actionable prediction.
+Improve rider and driver experience using actionable prediction.
 
 🚘 For Drivers & Riders
 See your ride’s cancellation probability before booking or pickup.
 
-Discover cancellation trends linked to trip details, zones, and timing.
+Discover cancellation trends related to trip details, zones, and timing.
 
 Make smarter decisions and reduce frustration.
 
@@ -26,10 +27,10 @@ Powers real-time insights for ride-sharing operations.
 
 ✨ Features & Highlights
 Feature	Description
-🔮 Live Cancellations	Get immediate cancellation risk prediction for any ride scenario.
-🗺️ Location-Based Analytics	Visualize cancellations by pickup/dropoff zones.
+🔮 Live Cancellations	Get immediate cancellation risk predictions for any ride scenario.
+🗺️ Location Analytics	Visualize cancellations by pickup/dropoff zones.
 ⚡ Time/Payment Insights	Analyze trends by booking hours and payment method.
-📊 Dashboard	Interactive charts and summary statistics.
+📊 Analytics Dashboard	Interactive charts and summary statistics.
 🤖 ML Model	Random Forest classifier trained on real Uber ride data.
 🎨 Custom Streamlit UI	Stylish dashboard & smooth navigation.
 🚀 How to Use This App
@@ -37,7 +38,9 @@ Prerequisites
 
 Python 3.9+
 
-Clone & install dependencies:
+Git
+
+Clone & Install Dependencies
 
 bash
 git clone https://github.com/MohamedAshraf-DE/Uber-Ride-Cancellation-Prediction.git
@@ -45,7 +48,7 @@ cd Uber-Ride-Cancellation-Prediction
 pip install -r requirements.txt
 Model Preparation
 
-Included: ride_cancel_model.pkl (via Git LFS)
+ride_cancel_model.pkl (pre-trained, included via Git LFS)
 
 No training needed.
 
@@ -56,7 +59,7 @@ streamlit run app.py
 Open your browser to explore live predictions and analytics!
 
 🛠️ Technical Details
-Model: RandomForestClassifier (sklearn)
+Model: RandomForestClassifier (scikit-learn)
 
 Features: Location, time, payment method, ride distance, driver type, weekday/weekend
 
